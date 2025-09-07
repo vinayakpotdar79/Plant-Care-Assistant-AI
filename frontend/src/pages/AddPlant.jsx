@@ -19,15 +19,19 @@ export default function AddPlant() {
   const handleUpload = async () => {
     const formData = new FormData();
     formData.append("image", file);
-
-    const res = await axios.post("/api/plants/add", formData);
+try{
+const res = await axios.post("http://localhost:5000/api/plants/add", formData);
     setPlantName(res.data.plantName);
     setImageUrl(res.data.imageUrl);
     setStep(2);
+}
+catch(err){
+  console.log(err)
+}
   };
 
   const handleSave = async () => {
-    await axios.post("/api/plants/save", {
+    await axios.post("http://localhost:5000/api/plants/save", {
       userId: user.user.id, // TODO: replace with logged-in user ID
       plantName,
       nickname,

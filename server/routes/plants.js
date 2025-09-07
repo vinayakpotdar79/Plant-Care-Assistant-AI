@@ -3,25 +3,26 @@ import multer from "multer";
 import axios from "axios";
 import { v2 as cloudinary } from "cloudinary";
 import Plant from "../models/Plant.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 const router = express.Router();
 
 // Multer config
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
-
+ 
 // Cloudinary config
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD,
-  api_key: process.env.CLOUDINARY_KEY,
-  api_secret: process.env.CLOUDINARY_SECRET,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
+console.log("done")
 // POST /api/plants/add
 router.post("/add", upload.single("image"), async (req, res) => {
   try {
     const file = req.file;
-
     if (!file) return res.status(400).json({ error: "No file uploaded" });
 
     // Upload to cloudinary
