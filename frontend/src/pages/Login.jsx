@@ -38,11 +38,11 @@ const Login = () => {
       if (type === "login") {
         const data = await loginUser(form);
         login(data);
-        alert("Login successful!");
+        console.log("Login successful!");
       } else {
         const data = await registerUser(form);
         login(data);
-        alert("Registered successfully!");
+        console.log("Registered successfully!");
       }
       console.log(`${type} submitted:`, form);
     } catch (err) {
