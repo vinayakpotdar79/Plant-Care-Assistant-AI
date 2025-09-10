@@ -28,9 +28,6 @@ export default function Navbar() {
           <Link to="/add-plant" className="hover:text-gray-200">
             Add Plant
           </Link>
-           <Link to="/dashboard" className="hover:text-gray-200">
-            Dashboard
-          </Link>
           <Link to="/report-issue" className="hover:text-gray-200">
             Report Issue
           </Link>
@@ -57,9 +54,6 @@ export default function Navbar() {
           </Link>
           <Link to="/report-issue" className="block hover:text-gray-200"onClick={() => setIsOpen(false)}>
             Report Issue
-          </Link>
-          <Link to="/rewards" className="block hover:text-gray-200"onClick={() => setIsOpen(false)}>
-            Rewards
           </Link>
           <Link to="/profile" className="block hover:text-gray-200" onClick={() => setIsOpen(false)}>
             Profile
