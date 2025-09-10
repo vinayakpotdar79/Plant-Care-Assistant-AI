@@ -4,7 +4,6 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import plantRoutes from "./routes/plants.js"; 
 import cors from "cors";
-import { auth } from "./middleware/auth.js";
 
 dotenv.config();
 connectDB();

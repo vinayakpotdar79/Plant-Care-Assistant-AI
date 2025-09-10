@@ -5,12 +5,11 @@ const plantSchema = new mongoose.Schema({
   name: { type: String, required: true },
   nickname: { type: String },
   imageUrl: { type: String, required: true }, // cloudinary URL
-  water: { type: String },
-  sunlight: { type: String },
-  nextCare: { type: String },
   health: { type: Number, default: 100 },
   lastWatered: { type: String, default: "Not yet" },
-  needsAttention: { type: Boolean, default: false }
+  nextWatering: { type: Date, default: null },
+  needsAttention: { type: Boolean, default: false },
+  wateringFrequency: { type: Number, default: 3 }, // in days
 }, { timestamps: true });
 
 export default mongoose.model("Plant", plantSchema);
