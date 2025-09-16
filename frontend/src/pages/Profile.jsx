@@ -1,283 +1,258 @@
-import { useContext, useState } from "react";
-import { AuthContext } from "../context/authContext";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-export default function ProfileSection() {
-  const { user, logout } = useContext(AuthContext);
-  const [activeTab, setActiveTab] = useState("plants");
+export default function Profile() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-    location: user?.location || "",
-    bio: user?.bio || "",
-    experience: user?.experience || "beginner"
+    name: "",
+    email: "",
+    phone: "",
   });
+  const [message, setMessage] = useState("");
 
-  // Sample user plants data
-  const userPlants = [
-    { id: 1, name: "Monstera Deliciosa", nickname: "Monty", health: 85, lastWatered: "2 days ago", image: "/plant1.jpg" },
-    { id: 2, name: "Snake Plant", nickname: "Slither", health: 92, lastWatered: "5 days ago", image: "/plant2.jpg" },
-    { id: 3, name: "Pothos", nickname: "Goldie", health: 78, lastWatered: "3 days ago", image: "/plant3.jpg" },
-  ];
-
-  // Sample achievements
-  const achievements = [
-    { id: 1, title: "Plant Parent", description: "Added your first plant", earned: true, icon: "🌱" },
-    { id: 2, title: "Green Thumb", description: "Kept a plant alive for 30 days", earned: true, icon: "👍" },
-    { id: 3, title: "Plant Expert", description: "Identified 10 different plants", earned: false, icon: "🔍" },
-    { id: 4, title: "Watering Pro", description: "Perfect watering for 2 weeks", earned: false, icon: "💧" },
-  ];
-
-  const handleSaveProfile = () => {
-    // Here you would typically make an API call to update the user profile
-    console.log("Saving profile:", editForm);
-    setIsEditing(false);
-    // Update context or global state with new user data
-  };
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userData = JSON.parse(localStorage.getItem("user"));
+        const token = userData.token;
+        const res = await axios.get("http://localhost:5000/api/users/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUser(res.data);
+        setEditForm({
+          name: res.data.name,
+          email: res.data.email,
+          phone: res.data.phone || "",
+        });
+      } catch (err) {
+        console.error("Failed to fetch profile:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEditForm(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleSave = async () => {
+    try {
+      const userData = JSON.parse(localStorage.getItem("user"));
+      const token = userData.token;
+      
+      const res = await axios.put(
+        "http://localhost:5000/api/users/me",
+        editForm,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      
+      setUser(res.data);
+      setIsEditing(false);
+      setMessage("Profile updated successfully!");
+      
+      // Update localStorage if needed
+      const updatedUser = { ...userData, ...res.data };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      
+      setTimeout(() => setMessage(""), 3000);
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      setMessage("Error updating profile. Please try again.");
+    }
+  };
+
+  // Calculate member duration
+  const getMemberDuration = () => {
+    if (!user?.joinedAt) return "Recently";
+    const joinedDate = new Date(user.joinedAt);
+    const today = new Date();
+    const diffTime = Math.abs(today - joinedDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 30) {
+      return `${diffDays} day${diffDays !== 1 ? 's' : ''}`;
+    } else if (diffDays < 365) {
+      const months = Math.floor(diffDays / 30);
+      return `${months} month${months !== 1 ? 's' : ''}`;
+    } else {
+      const years = Math.floor(diffDays / 365);
+      return `${years} year${years !== 1 ? 's' : ''}`;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white p-6 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white p-6 flex items-center justify-center">
+        <div className="text-center">
+          <svg className="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 极 0 015.656 0M9 10h.01M15 10h.01M21 极 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h3 className="mt-4 text-lg font-medium text-gray-900">User not found</h3>
+          <p className="mt-1 text-gray-500">Please try logging in again.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        {/* Profile Header */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-            <div className="relative">
-              <div className="w-24 h-24 rounded-full bg-emerald-100 flex items-center justify-center text-3xl">
-                {user?.name?.charAt(0) || 'U'}
-              </div>
-              <button className="absolute bottom-0 right-0 bg-emerald-500 text-white p-2 rounded-full shadow-md hover:bg-emerald-600 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-              </button>
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white p-6">
+      <div className="max-w-2xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-emerald-800 mb-2">Your Profile</h1>
+          <p className="text-gray-600">Manage your account information</p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+            <div className="text-2xl font-bold text-emerald-600">{user.points || 0}</div>
+            <div className="text-sm text-gray-600">Total Points</div>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+            <div className="text-2xl font-bold text-emerald-600">{getMemberDuration()}</div>
+            <div className="text-sm text-gray-600">Member For</div>
+          </div>
+        </div>
+
+        {/* Profile Card */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          {/* Success/Error Message */}
+          {message && (
+            <div className={`mb-4 p-3 rounded-lg ${
+              message.includes("Error") 
+                ? "bg-red-100 text-red-700" 
+                : "bg-emerald-100 text-emerald-700"
+            }`}>
+              {message}
             </div>
+          )}
 
-            <div className="flex-1 text-center md:text-left">
-              {isEditing ? (
-                <div className="space-y-4">
-                  <input
-                    type="text"
-                    name="name"
-                    value={editForm.name}
-                    onChange={handleInputChange}
-                    className="text-2xl font-bold border-b-2 border-emerald-500 focus:outline-none focus:border-emerald-600"
-                    placeholder="Your Name"
-                  />
-                  <input
-                    type="text"
-                    name="location"
-                    value={editForm.location}
-                    onChange={handleInputChange}
-                    className="text-gray-600 border-b-2 border-gray-300 focus:outline-none focus:border-emerald-500"
-                    placeholder="Your Location"
-                  />
-                  <textarea
-                    name="bio"
-                    value={editForm.bio}
-                    onChange={handleInputChange}
-                    className="w-full text-gray-700 border-2 border-gray-300 rounded-lg p-2 focus:outline-none focus:border-emerald-500"
-                    rows="3"
-                    placeholder="Tell us about your plant journey..."
-                  />
-                  <select
-                    name="experience"
-                    value={editForm.experience}
-                    onChange={handleInputChange}
-                    className="border-2 border-gray-300 rounded-lg p-2 focus:outline-none focus:border-emerald-500"
-                  >
-                    <option value="beginner">Beginner Plant Parent</option>
-                    <option value="intermediate">Intermediate Gardener</option>
-                    <option value="expert">Plant Expert</option>
-                  </select>
-                </div>
-              ) : (
-                <>
-                  <h1 className="text-2xl font-bold text-gray-900">{user?.name || 'Plant Lover'}</h1>
-                  <p className="text-gray-600 mb-2">{user?.location || 'Location not set'}</p>
-                  <p className="text-gray-700 mb-4">{user?.bio || 'No bio yet. Share your plant journey!'}</p>
-                  <div className="flex items-center justify-center md:justify-start gap-4">
-                    <span className="bg-emerald-100 text-emerald-800 text-sm font-medium px-3 py-1 rounded-full">
-                      {user?.experience ? editForm.experience.replace(/\b\w/g, l => l.toUpperCase()) : 'Beginner'}
-                    </span>
-                    <span className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
-                      {userPlants.length} Plants
-                    </span>
-                  </div>
-                </>
-              )}
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-gray-900">Personal Information</h2>
+            <button
+              onClick={() => setIsEditing(!isEditing)}
+              className="text-emerald-600 hover:text-emerald-700 font-medium"
+            >
+              {isEditing ? "Cancel" : "Edit Profile"}
+            </button>
+          </div>
 
-              <div className="flex gap-3 mt-6 justify-center md:justify-start">
-                {isEditing ? (
-                  <>
-                    <button
-                      onClick={handleSaveProfile}
-                      className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
-                    >
-                      Save Changes
-                    </button>
-                    <button
-                      onClick={() => setIsEditing(false)}
-                      className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      onClick={() => setIsEditing(true)}
-                      className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
-                    >
-                      Edit Profile
-                    </button>
-                    <button
-                      onClick={logout}
-                      className="border border-red-300 text-red-600 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors"
-                    >
-                      Sign Out
-                    </button>
-                  </>
-                )}
+          {isEditing ? (
+            <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={editForm.name}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  required
+                />
               </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-xl shadow-sm p-4 text-center">
-            <div className="text-2xl font-bold text-emerald-600">{userPlants.length}</div>
-            <div className="text-sm text-gray-600">Total Plants</div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm p-4 text-center">
-            <div className="text-2xl font-bold text-emerald-600">5</div>
-            <div className="text-sm text-gray-600">Species</div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm p-4 text-center">
-            <div className="text-2xl font-bold text-emerald-600">87%</div>
-            <div className="text-sm text-gray-600">Avg. Health</div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm p-4 text-center">
-            <div className="text-2xl font-bold text-emerald-600">{achievements.filter(a => a.earned).length}</div>
-            <div className="text-sm text-gray-600">Achievements</div>
-          </div>
-        </div>
-
-        {/* Navigation Tabs */}
-        <div className="flex border-b border-gray-200 mb-6">
-          <button
-            onClick={() => setActiveTab("plants")}
-            className={`px-4 py-2 font-medium ${activeTab === "plants" ? "text-emerald-600 border-b-2 border-emerald-600" : "text-gray-500 hover:text-gray-700"}`}
-          >
-            My Plants
-          </button>
-          <button
-            onClick={() => setActiveTab("achievements")}
-            className={`px-4 py-2 font-medium ${activeTab === "achievements" ? "text-emerald-600 border-b-2 border-emerald-600" : "text-gray-500 hover:text-gray-700"}`}
-          >
-            Achievements
-          </button>
-          <button
-            onClick={() => setActiveTab("settings")}
-            className={`px-4 py-2 font-medium ${activeTab === "settings" ? "text-emerald-600 border-b-2 border-emerald-600" : "text-gray-500 hover:text-gray-700"}`}
-          >
-            Settings
-          </button>
-        </div>
-
-        {/* Tab Content */}
-        {activeTab === "plants" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {userPlants.map(plant => (
-              <div key={plant.id} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                <div className="h-40 bg-emerald-100 flex items-center justify-center">
-                  <span className="text-4xl">🌿</span>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-lg">{plant.nickname}</h3>
-                  <p className="text-gray-600 text-sm">{plant.name}</p>
-                  <div className="mt-3">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Health</span>
-                      <span>{plant.health}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className={`h-2 rounded-full ${plant.health > 80 ? 'bg-emerald-500' : plant.health > 60 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                        style={{ width: `${plant.health}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                  <p className="text-gray-500 text-sm mt-2">Last watered: {plant.lastWatered}</p>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={editForm.email}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  required
+                />
               </div>
-            ))}
-          </div>
-        )}
 
-        {activeTab === "achievements" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {achievements.map(achievement => (
-              <div 
-                key={achievement.id} 
-                className={`bg-white rounded-xl shadow-sm p-4 flex items-center gap-4 ${achievement.earned ? '' : 'opacity-50'}`}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={editForm.phone}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Optional"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-emerald-600 text-white py-3 rounded-lg font-medium hover:bg-emerald-700 transition-colors"
               >
-                <div className="text-3xl">{achievement.icon}</div>
-                <div>
-                  <h3 className="font-semibold">{achievement.title}</h3>
-                  <p className="text-gray-600 text-sm">{achievement.description}</p>
-                  <span className={`text-xs mt-1 ${achievement.earned ? 'text-emerald-600' : 'text-gray-400'}`}>
-                    {achievement.earned ? 'Earned' : 'Not yet earned'}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {activeTab === "settings" && (
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="font-semibold text-lg mb-4">Account Settings</h3>
+                Save Changes
+              </button>
+            </form>
+          ) : (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email Notifications</label>
-                <div className="flex items-center">
-                  <input type="checkbox" className="rounded text-emerald-600 focus:ring-emerald-500" defaultChecked />
-                  <span className="ml-2 text-sm text-gray-600">Receive plant care reminders</span>
-                </div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Full Name
+                </label>
+                <p className="text-gray-900">{user.name}</p>
               </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Watering Reminders</label>
-                <select className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                  <option>1 day before</option>
-                  <option>2 days before</option>
-                  <option>On the day</option>
-                </select>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email Address
+                </label>
+                <p className="text-gray-900">{user.email}</p>
               </div>
+              
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Temperature Unit</label>
-                <div className="flex gap-4">
-                  <label className="flex items-center">
-                    <input type="radio" name="temperature" className="text-emerald-600 focus:ring-emerald-500" defaultChecked />
-                    <span className="ml-2 text-sm text-gray-600">Celsius</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input type="radio" name="temperature" className="text-emerald-600 focus:ring-emerald-500" />
-                    <span className="ml-2 text-sm text-gray-600">Fahrenheit</span>
-                  </label>
-                </div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Member Since
+                </label>
+                <p className="text-gray-900">
+                  {user.joinedAt ? new Date(user.joinedAt).toLocaleDateString() : "N/A"}
+                </p>
               </div>
-              <button className="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors mt-4">
-                Delete Account
-              </button>
+
+              {user.role && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Role
+                  </label>
+                  <p className="text-gray-900 capitalize">{user.role}</p>
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          )}
+        </div>
+
+        {/* Points Explanation */}
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mt-6">
+          <h3 className="text-lg font-semibold text-blue-800 mb-3">🎯 About Points</h3>
+          <p className="text-blue-700 text-sm">
+            Earn points by taking care of your plants! You get points for watering plants on time,
+            identifying new species, and keeping your plants healthy. The more points you earn,
+            the higher your plant parent ranking!
+          </p>
+        </div>
       </div>
     </div>
   );
