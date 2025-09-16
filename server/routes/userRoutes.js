@@ -18,12 +18,12 @@ router.get("/me",auth, async (req, res) => {
 // Update user
 router.put("/me", auth, async (req, res) => {
   try {
-    const { name, email, phone } = req.body;
+    const { name, email} = req.body;
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
-      { name, email, phone },
+      { name, email},
       { new: true }
-    ).select("-password");
+    );
 
     res.json(updatedUser);
   } catch (err) {
