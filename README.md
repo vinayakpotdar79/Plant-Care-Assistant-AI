@@ -133,16 +133,7 @@ plant-care-assistant-ai/
 3. **Track Care** - Receive reminders and log plant care activities
 4. **Diagnose Issues** - Get AI-powered diagnosis for plant problems
 5. **Monitor Health** - Track plant growth and health over time
-
-## 🛠️ Development
-
-### Contributing
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
+   
 ### Environment Variables
 Backend `.env`:
 ```
@@ -152,9 +143,3 @@ CLOUDINARY_CLOUD_NAME=your_cloudinary_name
 CLOUDINARY_API_KEY=your_cloudinary_key
 CLOUDINARY_API_SECRET=your_cloudinary_secret
 PLANT_API_KEY=your_plant_identification_api_key
-```
-
-Frontend `.env`:
-```
-REACT_APP_API_URL=http://localhost:5000
-REACT_APP_CLOUDINARY_CLOUD_NAME=your_cloudinary_name
