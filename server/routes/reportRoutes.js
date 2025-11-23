@@ -27,7 +27,7 @@ router.post("/", upload.single("image"), async (req, res) => {
       };
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = description
       ? `Plant issue reported: ${description}. Diagnose and suggest solution.`
