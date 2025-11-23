@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import PlantBot from "./Plantbot";
 
 export default function Home() {
   const [plants, setPlants] = useState([]);
@@ -171,7 +172,6 @@ export default function Home() {
                   )}
                 </div>
               </Link>
-              
               <div className="mt-4 w-full">
                 <Link to={`/plants/${plant._id}`}>
                   <h3 className="font-semibold text-emerald-800 group-hover:text-emerald-600 transition-colors">
@@ -225,7 +225,7 @@ export default function Home() {
           ))}
         </div>
       )}
-
+      <PlantBot/>
       {/* Add Plant Floating Button */}
       <Link
         to="/add-plant"

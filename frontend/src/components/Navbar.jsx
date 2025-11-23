@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/authContext";
 import { Menu, X } from "lucide-react";
-
+import Logo from "../assets/logo.png";
 export default function Navbar() {
   const { logout } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
@@ -11,10 +11,11 @@ export default function Navbar() {
     <nav className="sticky top-0 left-0 w-full z-50 bg-emerald-600/85 backdrop-blur-md text-white shadow-md">
       <div className="w-full flex items-center justify-between md:px-14 px-6 py-3">
         {/* Logo */}
-        <Link to="/" className="text-xl font-bold hover:opacity-90 transition">
-          🌱 Flora AI
+       <Link to="/" className="flex items-center text-xl font-bold hover:opacity-90 transition">
+         <img src={Logo} className="w-14 mr-2" alt="Flora AI Logo" />
+          {/* The text provides context for the link */}
+          <span>Flora AI</span>
         </Link>
-
         {/* Hamburger (mobile only) */}
         <button
           className="md:hidden block hover:opacity-80 transition"
