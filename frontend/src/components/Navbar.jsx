@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/authContext";
 import { Menu, X } from "lucide-react";
-import Logo from "../assets/logo.png";
+import Logo from "/Logo.png"
 export default function Navbar() {
   const { logout } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
