@@ -18,7 +18,7 @@ app.use(express.json());
 
 const allowedOrigins = [
   "http://localhost:5173",                    // local dev
-  "https://plant-care-assistant-ai.vercel.app/",  // production UI
+  "https://plant-care-assistant-ai.vercel.app",  // production UI
 ];
 
 app.use(
