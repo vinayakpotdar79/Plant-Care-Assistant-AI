@@ -30,8 +30,8 @@ router.post("/", upload.single("image"), async (req, res) => {
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = description
-      ? `Plant issue reported: ${description}. Diagnose and suggest solution.`
-      : "Diagnose plant issue from the uploaded image and suggest solution.";
+      ? `Plant issue reported: ${description}. Diagnose and suggest solution in proper format.`
+      : "Diagnose plant issue from the uploaded image and suggest solution in proper format.";
 
     const result = await model.generateContent({
       contents: [
