@@ -44,7 +44,7 @@ const Login = () => {
         login(data);
         console.log("Registered successfully!");
       }
-      console.log(`${type} submitted:`, form);
+      // console.log(`${type} submitted:`, form);
     } catch (err) {
       alert(err.response?.data?.msg || "Something went wrong");
     }

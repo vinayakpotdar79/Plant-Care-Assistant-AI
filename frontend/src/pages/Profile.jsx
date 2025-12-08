@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import API from "../services/api";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -17,7 +18,7 @@ export default function Profile() {
       try {
         const userData = JSON.parse(localStorage.getItem("user"));
         const token = userData.token;
-        const res = await axios.get("http://localhost:5000/api/users/me", {
+        const res = await API.get("/users/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(res.data);
@@ -45,8 +46,8 @@ export default function Profile() {
       const userData = JSON.parse(localStorage.getItem("user"));
       const token = userData.token;
       
-      const res = await axios.put(
-        "http://localhost:5000/api/users/me",
+      const res = await API.put(
+        "/users/me",
         editForm,
         {
           headers: { Authorization: `Bearer ${token}` },

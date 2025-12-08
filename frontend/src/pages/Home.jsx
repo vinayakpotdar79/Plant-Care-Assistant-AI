@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import PlantBot from "./Plantbot";
+import API from "../services/api";
 
 export default function Home() {
   const [plants, setPlants] = useState([]);
@@ -14,7 +15,7 @@ export default function Home() {
       try {
         const user = JSON.parse(localStorage.getItem("user"));
         const token = user.token;
-        const res = await axios.get("http://localhost:5000/api/plants", {
+        const res = await API.get("/plants", {
           headers: { Authorization: `Bearer ${token}` }
         });
         setPlants(res.data);
@@ -42,8 +43,8 @@ export default function Home() {
       const user = JSON.parse(localStorage.getItem("user"));
       const token = user.token;
       
-      await axios.patch(
-        `http://localhost:5000/api/plants/${plantId}/water`,
+      await API.patch(
+        `/plants/${plantId}/water`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

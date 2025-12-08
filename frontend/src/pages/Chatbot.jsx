@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import API from "../services/api";
 
 export default function Chatbot({ onClose }) {
   const [messages, setMessages] = useState([
@@ -17,7 +18,7 @@ export default function Chatbot({ onClose }) {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/chat", { message: input });
+      const res = await API.post("/chat", { message: input });
       setMessages([...newMessages, { sender: "flora", text: res.data.reply }]);
     } catch (err) {
       console.error("Error chatting:", err);

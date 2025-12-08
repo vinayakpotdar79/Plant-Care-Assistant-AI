@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import axios from "axios";
+import API from "../services/api";
 
 export default function ReportIssue() {
   const [description, setDescription] = useState("");
@@ -45,7 +46,7 @@ export default function ReportIssue() {
 
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:5000/api/report", formData, {
+      const res = await API.post("/report", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setDiagnosis(res.data.diagnosis);

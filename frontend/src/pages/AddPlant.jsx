@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/authContext";
-
+import API from "../services/api";
 export default function AddPlant() {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -44,7 +44,7 @@ export default function AddPlant() {
     formData.append("image", file);
     console.log(formData)
     try {
-      const res = await axios.post("http://localhost:5000/api/plants/add", formData);
+      const res = await API.post("/plants/add", formData);
       setPlantName(res.data.plantName);
       setImageUrl(res.data.imageUrl);
       setStep(2);
@@ -62,7 +62,7 @@ export default function AddPlant() {
     setLoading(true);
     
     try {
-      await axios.post("http://localhost:5000/api/plants/save", {
+      await API.post("/plants/save", {
         userId: user.user.id,
         plantName,
         nickname: nickname || plantName, // Use plant name if no nickname provided

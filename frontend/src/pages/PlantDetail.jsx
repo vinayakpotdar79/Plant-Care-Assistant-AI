@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, Link,useNavigate } from "react-router-dom";
 import axios from "axios";
+import API from "../services/api"
+
 export default function PlantDetail() {
   const { id } = useParams();
   const [plant, setPlant] = useState(null);
@@ -13,7 +15,7 @@ export default function PlantDetail() {
       const user = JSON.parse(localStorage.getItem("user"));
       const token = user.token;
       try {
-        const res = await axios.get(`http://localhost:5000/api/plants/${id}`, {
+        const res = await API.get(`/plants/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setPlant(res.data);
@@ -31,8 +33,8 @@ export default function PlantDetail() {
       const user = JSON.parse(localStorage.getItem("user"));
       const token = user.token;
       
-      const res = await axios.patch(
-        `http://localhost:5000/api/plants/${id}/water`,
+      const res = await API.patch(
+        `/plants/${id}/water`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -93,7 +95,7 @@ const deletePlant = async () => {
   try {
     const user = JSON.parse(localStorage.getItem("user"));
     const token = user.token;
-    const res=await axios.delete(`http://localhost:5000/api/plants/${id}`, {
+    const res=await API.delete(`/plants/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     
